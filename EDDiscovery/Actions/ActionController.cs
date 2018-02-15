@@ -72,14 +72,17 @@ namespace EDDiscovery.Actions
             discoveryform = frm;
             discoverycontroller = ctrl;
 
-            #if !NO_SYSTEM_SPEECH
-            // Windows TTS (2000 and above). Speech *recognition* will be Version.Major >= 6 (Vista and above)
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT && Environment.OSVersion.Version.Major >= 5 && !EDDOptions.Instance.NoSound)
+            for (int i = 0; i < 100; i++)
+            {
+
+#if !NO_SYSTEM_SPEECH
+                // Windows TTS (2000 and above). Speech *recognition* will be Version.Major >= 6 (Vista and above)
+                if (Environment.OSVersion.Platform == PlatformID.Win32NT && Environment.OSVersion.Version.Major >= 5 && !EDDOptions.Instance.NoSound)
             {
                 audiodriverwave = new AudioExtensions.AudioDriverCSCore(EDDConfig.Instance.DefaultWaveDevice);
                 audiodriverspeech = new AudioExtensions.AudioDriverCSCore(EDDConfig.Instance.DefaultVoiceDevice);
-                speechsynth = new AudioExtensions.SpeechSynthesizer(new AudioExtensions.WindowsSpeechEngine());
-                voicerecon = new AudioExtensions.VoiceRecognitionWindows();
+             //   speechsynth = new AudioExtensions.SpeechSynthesizer(new AudioExtensions.WindowsSpeechEngine());
+            //    voicerecon = new AudioExtensions.VoiceRecognitionWindows();
             }
             else
             {
@@ -94,8 +97,33 @@ namespace EDDiscovery.Actions
             speechsynth = new AudioExtensions.SpeechSynthesizer(new AudioExtensions.DummySpeechEngine());
             voicerecon = new AudioExtensions.VoiceRecognitionDummy();
 #endif
-            audioqueuewave = new AudioExtensions.AudioQueue(audiodriverwave);
-            audioqueuespeech = new AudioExtensions.AudioQueue(audiodriverspeech);
+                audioqueuewave = new AudioExtensions.AudioQueue(audiodriverwave);
+                audioqueuespeech = new AudioExtensions.AudioQueue(audiodriverspeech);
+
+                AudioQueue.AudioSample s = audioqueuewave.Generate(@"E:\Music\Above & Beyond\Tri-State\Tri-State 03 World On Fire.mp3");
+                audioqueuewave.Submit(s, 50, AudioQueue.Priority.Normal);
+
+
+                AudioQueue.AudioSample ss = audioqueuespeech.Generate(@"E:\Music\Above & Beyond\Tri-State\Tri-State 04 Air For Life.mp3");
+                audioqueuespeech.Submit(ss, 50, AudioQueue.Priority.Normal);
+                AudioQueue.AudioSample s2 = audioqueuewave.Generate(@"E:\Music\Above & Beyond\Tri-State\Tri-State 03 World On Fire.mp3");
+
+                System.Threading.Thread.Sleep(500);
+
+                audioqueuewave.Submit(s2, 50, AudioQueue.Priority.Normal);
+                audioqueuewave.Submit(s, 50, AudioQueue.Priority.High);
+
+                System.Threading.Thread.Sleep(1000);
+
+                audioqueuewave.StopAll();
+                audioqueuewave.Dispose();
+                audiodriverwave.Dispose();
+                audioqueuespeech.StopAll();
+                audioqueuespeech.Dispose();
+                audiodriverspeech.Dispose();
+            }
+
+
 
             frontierbindings = new BindingsFile();
             inputdevices = new DirectInputDevices.InputDeviceList(a => discoveryform.BeginInvoke(a));
@@ -493,6 +521,7 @@ namespace EDDiscovery.Actions
             }
 
             ActionRun(ActionEventEDList.onRefreshEnd);
+
         }
 
         public int ActionRunOnEntry(HistoryEntry he, ActionEvent ev, string flagstart = null, bool now = false)       //set flagstart to be the first flag of the actiondata..
