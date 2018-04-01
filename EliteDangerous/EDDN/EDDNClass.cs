@@ -149,19 +149,25 @@ namespace EliteDangerousCore.EDDN
             message.Remove("StarPosFromEDSM");
             message.Remove("Latitude");
             message.Remove("Longitude");
+
+            /*
             if (!journal.Docked)
             {
                 message.Remove("Body");
                 message.Remove("BodyType");
                 message.Remove("BodyID");
             }
+             */
 
             msg["message"] = message;
             return msg;
         }
 
-        public JObject CreateEDDNMessage(JournalDocked journal, double x, double y, double z, long? systemAddress)
+        public JObject CreateEDDNMessage(JournalDocked journal, ISystem system)
         {
+            if (!String.Equals(system.Name, journal.StarSystem, StringComparison.InvariantCultureIgnoreCase))
+                return null;
+
             JObject msg = new JObject();
 
             msg["header"] = Header();
@@ -173,10 +179,10 @@ namespace EliteDangerousCore.EDDN
             message.Remove("CockpitBreach");
             message.Remove("Wanted");
 
-            message["StarPos"] = new JArray(new float[] { (float)x, (float)y, (float)z });
+            message["StarPos"] = new JArray(new float[] { (float)system.X, (float)system.Y, (float)system.Z });
 
-            if (systemAddress != null)
-                message["SystemAddress"] = systemAddress;
+            if (system.SystemAddress != null && message["SystemAddress"] == null)
+                message["SystemAddress"] = system.SystemAddress;
 
             msg["message"] = message;
             return msg;
@@ -205,7 +211,7 @@ namespace EliteDangerousCore.EDDN
             return msg;
         }
 
-        public JObject CreateEDDNOutfittingMessage(JournalOutfitting journal, long? systemAddress)
+        public JObject CreateEDDNOutfittingMessage(JournalOutfitting journal, ISystem system = null)
         {
             if (journal.ModuleItems == null)
                 return null;
@@ -254,7 +260,7 @@ namespace EliteDangerousCore.EDDN
             return msg;
         }
 
-        public JObject CreateEDDNShipyardMessage(JournalShipyard journal, long? systemAddress)
+        public JObject CreateEDDNShipyardMessage(JournalShipyard journal, ISystem system = null)
         {
             if (journal.ShipyardItems == null)
                 return null;
@@ -303,7 +309,7 @@ namespace EliteDangerousCore.EDDN
             return msg;
         }
 
-        public JObject CreateEDDNMessage(JournalScan journal, string starSystem, double x, double y, double z, long? systemAddress = null)
+        public JObject CreateEDDNMessage(JournalScan journal, ISystem system)
         {
             JObject msg = new JObject();
 
@@ -312,11 +318,11 @@ namespace EliteDangerousCore.EDDN
 
             JObject message = journal.GetJson();
 
-            message["StarSystem"] = starSystem;
-            message["StarPos"] = new JArray(new float[] { (float)x, (float)y, (float)z });
+            message["StarSystem"] = system.Name;
+            message["StarPos"] = new JArray(new float[] { (float)system.X, (float)system.Y, (float)system.Z });
 
-            if (systemAddress != null)
-                message["SystemAddress"] = systemAddress;
+            if (system.SystemAddress != null)
+                message["SystemAddress"] = system.SystemAddress;
 
             if (message["Materials"] != null && message["Materials"] is JArray)
             {
@@ -328,7 +334,7 @@ namespace EliteDangerousCore.EDDN
 
             string bodydesig = journal.BodyDesignation ?? journal.BodyName;
 
-            if (!bodydesig.StartsWith(starSystem, StringComparison.InvariantCultureIgnoreCase))  // For now test if its a different name ( a few exception for like sol system with named planets)  To catch a rare out of sync bug in historylist.
+            if (!bodydesig.StartsWith(system.Name, StringComparison.InvariantCultureIgnoreCase))  // For now test if its a different name ( a few exception for like sol system with named planets)  To catch a rare out of sync bug in historylist.
             {
                 return null;
             }
