@@ -296,6 +296,9 @@ namespace EDDiscovery.UserControls
     {
         public static void FilterGridView(DataGridView vw, string searchstr)
         {
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+
             vw.SuspendLayout();
             vw.Enabled = false;
 
@@ -327,25 +330,39 @@ namespace EDDiscovery.UserControls
                 visibleChanged |= found != row.Visible;
             }
 
+            System.Diagnostics.Debug.WriteLine("comparision complete in " + sw.ElapsedMilliseconds);
+
             if (visibleChanged)
             {
+                //for (int i = 0; i < vw.RowCount; i++)
+                //  vw.Rows[i].Visible = visible[i];      //Bad
+
+
+
                 var selectedrow = vw.SelectedRows.OfType<DataGridViewRow>().Select(r => r.Index).FirstOrDefault();
+
                 DataGridViewRow[] rows = vw.Rows.OfType<DataGridViewRow>().ToArray();
+
                 vw.Rows.Clear();
 
                 for (int i = 0; i < rows.Length; i++)
                 {
                     rows[i].Visible = visible[i];
+                    vw.Rows.Add(rows[i]);
                 }
 
-                vw.Rows.Clear();
-                vw.Rows.AddRange(rows.ToArray());
+//                vw.Rows.Clear();
+  //              vw.Rows.AddRange(rows.ToArray());
 
                 vw.Rows[selectedrow].Selected = true;
+
+                System.Diagnostics.Debug.WriteLine("Search in " + sw.ElapsedMilliseconds + " count " + vw.RowCount);
             }
 
             vw.Enabled = true;
             vw.ResumeLayout();
+
+            System.Diagnostics.Debug.WriteLine("Search Finished in " + sw.ElapsedMilliseconds + " count " + vw.RowCount);
         }
     }
 

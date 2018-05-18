@@ -142,6 +142,8 @@ namespace BaseUtils.Win32
         public static extern uint SendInput(uint nInputs, NativeMethods.INPUT[] pInputs, int cbSize);
         [DllImport("user32.dll", ExactSpelling = true, CharSet = CharSet.Auto)]
         public static extern short GetAsyncKeyState(int vkey);
+        [DllImport("user32.dll")]
+        public static extern int SendMessage(IntPtr hWnd, Int32 wMsg, bool wParam, Int32 lParam);
 
         public static object PtrToStructure(IntPtr lparam, Type cls)
         {

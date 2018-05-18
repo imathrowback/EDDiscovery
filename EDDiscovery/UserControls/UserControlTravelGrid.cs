@@ -53,10 +53,6 @@ namespace EDDiscovery.UserControls
         public delegate void KeyDownInCell(int asciikeycode, int rowno, int colno, bool note);
         public event KeyDownInCell OnKeyDownInCell;   // After a change of selection
 
-        // for primary travel grid to chain stuff after display has been updated
-        public delegate void AddedNewEntry(HistoryEntry he, HistoryList hl, bool accepted);
-        public AddedNewEntry OnNewEntry;       // FIRED after discoveryform.onNewEntry->this.AddNewEntry completes
-
         #endregion
 
         #region Init
@@ -160,6 +156,7 @@ namespace EDDiscovery.UserControls
 
             current_historylist = hl;
 
+
             Tuple<long, int> pos = CurrentGridPosByJID();
 
             SortOrder sortorder = dataGridViewTravel.SortOrder;
@@ -172,21 +169,31 @@ namespace EDDiscovery.UserControls
 
             var filter = (TravelHistoryFilter)comboBoxHistoryWindow.SelectedItem ?? TravelHistoryFilter.NoFilter;
 
+
+            System.Diagnostics.Debug.WriteLine("Filter Start " + BaseUtils.AppTicks.TickCount100);
+
             List<HistoryEntry> result = filter.Filter(hl);
             fdropdown = hl.Count() - result.Count();
 
+            System.Diagnostics.Debug.WriteLine("Filter Elapsed " + BaseUtils.AppTicks.TickCount100);
+
             result = HistoryList.FilterByJournalEvent(result, SQLiteDBClass.GetSettingString(DbFilterSave, "All"), out ftotalevents);
+            System.Diagnostics.Debug.WriteLine("event Elapsed " + BaseUtils.AppTicks.TickCount100);
+
             result = FilterHelpers.FilterHistory(result, fieldfilter, discoveryform.Globals, out ftotalfilters);
-            
+            System.Diagnostics.Debug.WriteLine("history Elapsed " + BaseUtils.AppTicks.TickCount100);
+
             dataGridViewTravel.Rows.Clear();
             rowsbyjournalid.Clear();
 
-            for (int ii = 0; ii < result.Count; ii++) //foreach (var item in result)
+            for (int ii = 0; ii < result.Count; ii++) 
             {
-                AddNewHistoryRow(false, result[ii]);      // for every one in filter, add a row.
+                DataGridViewRow rw = CreateHistoryRow(result[ii], textBoxFilter.Text);
+                if ( rw != null)
+                    dataGridViewTravel.Rows.Add(rw);
             }
 
-            StaticFilters.FilterGridView(dataGridViewTravel, textBoxFilter.Text);
+            System.Diagnostics.Debug.WriteLine("Row Fill " + BaseUtils.AppTicks.TickCount100);
 
             UpdateToolTipsForFilter();
 
@@ -233,10 +240,9 @@ namespace EDDiscovery.UserControls
             }
             
             if (add)
-                AddNewHistoryRow(true, he);
-
-            if (OnNewEntry != null)
-                OnNewEntry(he, hl, add);
+            {
+                dataGridViewTravel.Rows.Insert(0,CreateHistoryRow(he,null));
+            }
 
             if (add)
             {
@@ -279,44 +285,43 @@ namespace EDDiscovery.UserControls
             }
         }
 
-        private void AddNewHistoryRow(bool insert, HistoryEntry item)            // second part of add history row, adds item to view.
+        private DataGridViewRow CreateHistoryRow(HistoryEntry item, string search)      
         {
             //string debugt = item.Journalid + "  " + item.System.id_edsm + " " + item.System.GetHashCode() + " "; // add on for debug purposes to a field below
 
+            DateTime time = EDDiscoveryForm.EDDConfig.DisplayUTC ? item.EventTimeUTC : item.EventTimeLocal;
+            item.journalEntry.FillInformation(out string EventDescription, out string EventDetailedInfo);
+            string note = (item.snc != null) ? item.snc.Note : "";
+
+            if ( search.HasChars() )
+            {
+                string timestr = time.ToString();
+                bool matched = timestr.IndexOf(search, StringComparison.InvariantCultureIgnoreCase) >= 0 ||
+                                item.EventSummary.IndexOf(search, StringComparison.InvariantCultureIgnoreCase) >= 0 ||
+                                EventDescription.IndexOf(search, StringComparison.InvariantCultureIgnoreCase) >= 0 ||
+                                note.IndexOf(search, StringComparison.InvariantCultureIgnoreCase) >= 0;
+                if (!matched)
+                    return null;
+            }
+
             var rw = dataGridViewTravel.RowTemplate.Clone() as DataGridViewRow;
 
-            item.journalEntry.FillInformation(out string EventDescription, out string EventDetailedInfo);
-
-            string travelinfo = item.TravelInfo();
-            if (travelinfo != null)
-                EventDetailedInfo = travelinfo + Environment.NewLine + EventDetailedInfo;
-
-            rw.CreateCells(dataGridViewTravel, EDDiscoveryForm.EDDConfig.DisplayUTC ? item.EventTimeUTC : item.EventTimeLocal, "", 
-                                item.EventSummary, EventDescription, (item.snc != null) ? item.snc.Note : "");
+            rw.CreateCells(dataGridViewTravel, time, "", item.EventSummary, EventDescription, note);
 
             rw.Cells[TravelHistoryColumns.HistoryTag].Tag = item;
 
-            int rownr = 0;
-            if (insert)
-            {
-                dataGridViewTravel.Rows.Insert(rownr, rw);
-            }
-            else
-            {
-                rownr = dataGridViewTravel.Rows.Add(rw);
-            }
-
-            rowsbyjournalid[item.Journalid] = dataGridViewTravel.Rows[rownr];
-
-            dataGridViewTravel.Rows[rownr].DefaultCellStyle.ForeColor = (item.System.HasCoordinate || item.EntryType != JournalTypeEnum.FSDJump) ? discoveryform.theme.VisitedSystemColor : discoveryform.theme.NonVisitedSystemColor;
+            rw.DefaultCellStyle.ForeColor = (item.System.HasCoordinate || item.EntryType != JournalTypeEnum.FSDJump) ? discoveryform.theme.VisitedSystemColor : discoveryform.theme.NonVisitedSystemColor;
 
             string tip = item.EventSummary + Environment.NewLine + EventDescription + Environment.NewLine + EventDetailedInfo;
 
-            dataGridViewTravel.Rows[rownr].Cells[0].ToolTipText = tip;
-            dataGridViewTravel.Rows[rownr].Cells[1].ToolTipText = tip;
-            dataGridViewTravel.Rows[rownr].Cells[2].ToolTipText = tip;
-            dataGridViewTravel.Rows[rownr].Cells[3].ToolTipText = tip;
-            dataGridViewTravel.Rows[rownr].Cells[4].ToolTipText = tip;
+            rw.Cells[0].ToolTipText = tip;
+            rw.Cells[1].ToolTipText = tip;
+            rw.Cells[2].ToolTipText = tip;
+            rw.Cells[3].ToolTipText = tip;
+            rw.Cells[4].ToolTipText = tip;
+
+            rowsbyjournalid[item.Journalid] = rw;
+            return rw;
 
 #if DEBUGVOICE
             List<Actions.ActionFileList.MatchingSets> ale = discoveryform.actionfiles.GetMatchingConditions(item.journalEntry.EventTypeStr);
@@ -450,19 +455,20 @@ namespace EDDiscovery.UserControls
         private void Searchtimer_Tick(object sender, EventArgs e)
         {
             searchtimer.Stop();
-            this.Cursor = Cursors.WaitCursor;
+            HistoryChanged(current_historylist);        // fires lots of events
+            //this.Cursor = Cursors.WaitCursor;
 
-            //System.Diagnostics.Debug.WriteLine(Environment.TickCount % 10000 + "Searching");
-            Tuple<long, int> pos = CurrentGridPosByJID();
+            ////System.Diagnostics.Debug.WriteLine(Environment.TickCount % 10000 + "Searching");
+            //Tuple<long, int> pos = CurrentGridPosByJID();
 
-            StaticFilters.FilterGridView(dataGridViewTravel, textBoxFilter.Text);
+            //StaticFilters.FilterGridView(dataGridViewTravel, textBoxFilter.Text);
 
-            int rowno = FindGridPosByJID(pos.Item1, true);
-            if (rowno >= 0)
-                dataGridViewTravel.CurrentCell = dataGridViewTravel.Rows[rowno].Cells[pos.Item2];
+            //int rowno = FindGridPosByJID(pos.Item1, true);
+            //if (rowno >= 0)
+            //    dataGridViewTravel.CurrentCell = dataGridViewTravel.Rows[rowno].Cells[pos.Item2];
 
-            this.Cursor = Cursors.Default;
-            //System.Diagnostics.Debug.WriteLine(Environment.TickCount % 10000 + "Complete");
+            //this.Cursor = Cursors.Default;
+            ////System.Diagnostics.Debug.WriteLine(Environment.TickCount % 10000 + "Complete");
         }
 
         private void dataGridViewTravel_RowPostPaint(object sender, DataGridViewRowPostPaintEventArgs e)

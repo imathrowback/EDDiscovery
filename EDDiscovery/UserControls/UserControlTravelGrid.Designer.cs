@@ -257,7 +257,7 @@ namespace EDDiscovery.UserControls
             this.copyJournalEntryToClipboardToolStripMenuItem,
             this.createEditBookmarkToolStripMenuItem});
             this.historyContextMenu.Name = "historyContextMenu";
-            this.historyContextMenu.Size = new System.Drawing.Size(388, 466);
+            this.historyContextMenu.Size = new System.Drawing.Size(388, 444);
             this.historyContextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.historyContextMenu_Opening);
             // 
             // removeSortingOfColumnsToolStripMenuItem

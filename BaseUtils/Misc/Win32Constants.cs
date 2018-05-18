@@ -582,6 +582,8 @@ namespace BaseUtils.Win32Constants
         /// <seealso href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd145213(v=vs.85).aspx"/>
         public const int PAINT = 0x000F;
 
+        public const int SETREDRAW = 11;
+
         /// <summary>
         /// An application sends the WM_FONTCHANGE message to all top-level windows in the system after changing the
         /// pool of font resources.
