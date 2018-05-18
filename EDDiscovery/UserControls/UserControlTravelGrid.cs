@@ -156,7 +156,6 @@ namespace EDDiscovery.UserControls
 
             current_historylist = hl;
 
-
             Tuple<long, int> pos = CurrentGridPosByJID();
 
             SortOrder sortorder = dataGridViewTravel.SortOrder;
