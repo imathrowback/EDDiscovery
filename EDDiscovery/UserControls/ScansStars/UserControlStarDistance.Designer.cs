@@ -69,6 +69,7 @@ namespace EDDiscovery.UserControls
             this.colName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colDistance = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colVisited = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colStarType = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.contextMenuStrip.SuspendLayout();
             this.flowLayoutStarDistances.SuspendLayout();
             this.dataViewScrollerPanel2.SuspendLayout();
@@ -83,33 +84,33 @@ namespace EDDiscovery.UserControls
             this.addToExpeditionToolStripMenuItem,
             this.viewOnEDSMToolStripMenuItem1});
             this.contextMenuStrip.Name = "closestContextMenu";
-            this.contextMenuStrip.Size = new System.Drawing.Size(177, 92);
+            this.contextMenuStrip.Size = new System.Drawing.Size(176, 92);
             // 
             // addToTrilaterationToolStripMenuItem1
             // 
             this.addToTrilaterationToolStripMenuItem1.Name = "addToTrilaterationToolStripMenuItem1";
-            this.addToTrilaterationToolStripMenuItem1.Size = new System.Drawing.Size(176, 22);
+            this.addToTrilaterationToolStripMenuItem1.Size = new System.Drawing.Size(175, 22);
             this.addToTrilaterationToolStripMenuItem1.Text = "Add to Trilateration";
             this.addToTrilaterationToolStripMenuItem1.Click += new System.EventHandler(this.addToTrilaterationToolStripMenuItem1_Click);
             // 
             // addToExplorationToolStripMenuItem
             // 
             this.addToExplorationToolStripMenuItem.Name = "addToExplorationToolStripMenuItem";
-            this.addToExplorationToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.addToExplorationToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
             this.addToExplorationToolStripMenuItem.Text = "Add To Exploration";
             this.addToExplorationToolStripMenuItem.Click += new System.EventHandler(this.addToExplorationToolStripMenuItem_Click);
             // 
             // addToExpeditionToolStripMenuItem
             // 
             this.addToExpeditionToolStripMenuItem.Name = "addToExpeditionToolStripMenuItem";
-            this.addToExpeditionToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.addToExpeditionToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
             this.addToExpeditionToolStripMenuItem.Text = "Add to Expedition";
             this.addToExpeditionToolStripMenuItem.Click += new System.EventHandler(this.addToExpeditionToolStripMenuItem_Click);
             // 
             // viewOnEDSMToolStripMenuItem1
             // 
             this.viewOnEDSMToolStripMenuItem1.Name = "viewOnEDSMToolStripMenuItem1";
-            this.viewOnEDSMToolStripMenuItem1.Size = new System.Drawing.Size(176, 22);
+            this.viewOnEDSMToolStripMenuItem1.Size = new System.Drawing.Size(175, 22);
             this.viewOnEDSMToolStripMenuItem1.Text = "View on EDSM";
             this.viewOnEDSMToolStripMenuItem1.Click += new System.EventHandler(this.viewOnEDSMToolStripMenuItem1_Click);
             // 
@@ -205,10 +206,13 @@ namespace EDDiscovery.UserControls
             // 
             this.checkBoxCube.AutoSize = true;
             this.checkBoxCube.CheckBoxColor = System.Drawing.Color.Gray;
+            this.checkBoxCube.CheckBoxDisabledScaling = 0.5F;
             this.checkBoxCube.CheckBoxInnerColor = System.Drawing.Color.White;
             this.checkBoxCube.CheckColor = System.Drawing.Color.DarkBlue;
             this.checkBoxCube.ImageButtonDisabledScaling = 0.5F;
+            this.checkBoxCube.ImageIndeterminate = null;
             this.checkBoxCube.ImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.checkBoxCube.ImageUnchecked = null;
             this.checkBoxCube.Location = new System.Drawing.Point(187, 1);
             this.checkBoxCube.Margin = new System.Windows.Forms.Padding(0, 1, 8, 1);
             this.checkBoxCube.MouseOverColor = System.Drawing.Color.CornflowerBlue;
@@ -260,13 +264,13 @@ namespace EDDiscovery.UserControls
             this.vScrollBarCustom2.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.vScrollBarCustom2.HideScrollBar = true;
             this.vScrollBarCustom2.LargeChange = 0;
-            this.vScrollBarCustom2.Location = new System.Drawing.Point(339, 0);
+            this.vScrollBarCustom2.Location = new System.Drawing.Point(336, 0);
             this.vScrollBarCustom2.Maximum = -1;
             this.vScrollBarCustom2.Minimum = 0;
             this.vScrollBarCustom2.MouseOverButtonColor = System.Drawing.Color.Green;
             this.vScrollBarCustom2.MousePressedButtonColor = System.Drawing.Color.Red;
             this.vScrollBarCustom2.Name = "vScrollBarCustom2";
-            this.vScrollBarCustom2.Size = new System.Drawing.Size(13, 550);
+            this.vScrollBarCustom2.Size = new System.Drawing.Size(16, 550);
             this.vScrollBarCustom2.SliderColor = System.Drawing.Color.DarkGray;
             this.vScrollBarCustom2.SmallChange = 1;
             this.vScrollBarCustom2.TabIndex = 24;
@@ -296,7 +300,8 @@ namespace EDDiscovery.UserControls
             this.dataGridViewNearest.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colName,
             this.colDistance,
-            this.colVisited});
+            this.colVisited,
+            this.colStarType});
             this.dataGridViewNearest.ContextMenuStrip = this.contextMenuStrip;
             dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
@@ -319,7 +324,7 @@ namespace EDDiscovery.UserControls
             this.dataGridViewNearest.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.dataGridViewNearest.RowHeadersVisible = false;
             this.dataGridViewNearest.ScrollBars = System.Windows.Forms.ScrollBars.None;
-            this.dataGridViewNearest.Size = new System.Drawing.Size(339, 550);
+            this.dataGridViewNearest.Size = new System.Drawing.Size(336, 550);
             this.dataGridViewNearest.TabIndex = 23;
             this.dataGridViewNearest.SortCompare += new System.Windows.Forms.DataGridViewSortCompareEventHandler(this.dataGridViewNearest_SortCompare);
             this.dataGridViewNearest.MouseDown += new System.Windows.Forms.MouseEventHandler(this.dataGridViewNearest_MouseDown);
@@ -346,6 +351,12 @@ namespace EDDiscovery.UserControls
             this.colVisited.Name = "colVisited";
             this.colVisited.ReadOnly = true;
             // 
+            // colStarType
+            // 
+            this.colStarType.HeaderText = "Star Type";
+            this.colStarType.Name = "colStarType";
+            this.colStarType.ReadOnly = true;
+            // 
             // UserControlStarDistance
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -371,9 +382,6 @@ namespace EDDiscovery.UserControls
         private ExtendedControls.ExtPanelDataGridViewScroll dataViewScrollerPanel2;
         private ExtendedControls.ExtScrollBar vScrollBarCustom2;
         private System.Windows.Forms.DataGridView dataGridViewNearest;
-        private DataGridViewTextBoxColumn colName;
-        private DataGridViewTextBoxColumn colDistance;
-        private DataGridViewTextBoxColumn colVisited;
         private System.Windows.Forms.Label labelExtMin;
         private ExtendedControls.NumberBoxDouble textMinRadius;
         private System.Windows.Forms.Label labelExtMax;
@@ -383,5 +391,9 @@ namespace EDDiscovery.UserControls
         private ToolStripMenuItem addToExplorationToolStripMenuItem;
         private ToolStripMenuItem addToExpeditionToolStripMenuItem;
         private FlowLayoutPanel flowLayoutStarDistances;
+        private DataGridViewTextBoxColumn colName;
+        private DataGridViewTextBoxColumn colDistance;
+        private DataGridViewTextBoxColumn colVisited;
+        private DataGridViewTextBoxColumn colStarType;
     }
 }
