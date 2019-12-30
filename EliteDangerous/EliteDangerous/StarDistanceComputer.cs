@@ -20,6 +20,7 @@ using System.Linq;
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
+using System.Collections.Generic;
 
 namespace EliteDangerousCore
 {
@@ -100,13 +101,19 @@ namespace EliteDangerousCore
 
                                 //System.Diagnostics.Debug.WriteLine("DB Computer Max distance " + req.MaxDistance);
 
-                                bool useOnline = true;
+                                // Don't try to use online for large distances, or the time to load will be *too high*, eg, tens of seconds
+                                bool useOnline = (req.MaxDistance - req.MinDistance < 50);
                                 if (useOnline)
                                 {
                                     var edsm = new EDSMClass();
-                                    foreach (var x in edsm.GetSphereSystems(sys.Name, req.MaxDistance, req.MinDistance))
+
+                                    List<Tuple<ISystem, double>> systems = edsm.GetSphereSystems(sys.Name, req.MaxDistance, req.MinDistance);
+                                    if (systems != null)
                                     {
-                                        closestsystemlist.Add(x.Item2, x.Item1);
+                                        foreach (var x in systems)
+                                        {
+                                            closestsystemlist.Add(x.Item2, x.Item1);
+                                        }
                                     }
 
 

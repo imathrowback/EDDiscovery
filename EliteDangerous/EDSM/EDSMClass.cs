@@ -580,23 +580,25 @@ namespace EliteDangerousCore.EDSM
         #region System Information
 
         // protected against bad JSON
-        public List<Tuple<ISystem, double>> GetSphereSystems(String systemName, double maxradius, double minradius)      // may return null
+        public List<Tuple<ISystem, double>> GetSphereSystems(String systemName, double maxradius, double minradius, double x = 0, double y = 0, double z = 0)      // may return null
         {
-            return GetRadiusSystems(systemName, maxradius, minradius, true);
+            return GetRadiusSystems(systemName, maxradius, minradius, true, x, y, z);
         }
 
-        public List<Tuple<ISystem, double>> GetCubeSystems(String systemName, double maxradius, double minradius)      // may return null
+        public List<Tuple<ISystem, double>> GetCubeSystems(String systemName, double maxradius, double minradius, double x = 0, double y = 0, double z = 0)      // may return null
         {
-            return GetRadiusSystems(systemName, maxradius, minradius, false);
+            return GetRadiusSystems(systemName, maxradius, minradius, false, x, y, z);
         }
 
-        public List<Tuple<ISystem,double>> GetRadiusSystems(String systemName, double maxradius, double minradius, Boolean sphere)      // may return null
+        public List<Tuple<ISystem,double>> GetRadiusSystems(String systemName, double maxradius, double minradius, bool sphere, double x = 0, double y = 0, double z = 0)      // may return null
         {
             // no rate detection performed here
             String qType = sphere ? "sphere" : "cube";
-            string query = String.Format("api-v1/" + qType + "-systems?systemName={0}&radius={1}&minRadius={2}&showPrimaryStar=1&showCoordinates=1&showId=1", Uri.EscapeDataString(systemName), maxradius , minradius);
+            string query = String.Format("api-v1/{0}-systems?systemName={1}&radius={2}&minRadius={3}&showPrimaryStar=1&showCoordinates=1&showId=1", qType, Uri.EscapeDataString(systemName), maxradius , minradius);
 
-            var response = RequestGet(query, handleException: true);
+            // in systems where the stars are close together, this may take a while to complete, so increase the timeout
+            // TODO: Make this "page", doing say 50 LY at a time
+            var response = RequestGet(query, handleException: true, timeout: 10000);
             if (response.Error)
                 return null;
 
