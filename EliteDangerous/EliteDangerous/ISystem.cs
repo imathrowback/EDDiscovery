@@ -130,6 +130,8 @@ namespace EliteDangerousCore
         int GridID { get; set; }
         long? SystemAddress { get; set; }
 
+        String PrimaryStarType { get; set; }
+
         double Distance(ISystemBase other);
         double Distance(double x, double y, double z);
         double DistanceSq(double x, double y, double z);

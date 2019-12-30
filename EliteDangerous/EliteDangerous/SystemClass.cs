@@ -35,6 +35,7 @@ namespace EliteDangerousCore
 
         public string Name { get; set; }
 
+        public String PrimaryStarType { get; set; }
         public int Xi { get; set; }
         public int Yi { get; set; }
         public int Zi { get; set; }

@@ -15,6 +15,8 @@
  */
 
 using EliteDangerousCore;
+using EliteDangerousCore.EDSM;
+using System.Linq;
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
@@ -98,9 +100,22 @@ namespace EliteDangerousCore
 
                                 //System.Diagnostics.Debug.WriteLine("DB Computer Max distance " + req.MaxDistance);
 
-                                DB.SystemCache.GetSystemListBySqDistancesFrom(closestsystemlist, sys.X, sys.Y, sys.Z, req.MaxItems , 
-                                              req.MinDistance, req.MaxDistance , req.Spherical);
+                                bool useOnline = true;
+                                if (useOnline)
+                                {
+                                    var edsm = new EDSMClass();
+                                    foreach (var x in edsm.GetSphereSystems(sys.Name, req.MaxDistance, req.MinDistance))
+                                    {
+                                        closestsystemlist.Add(x.Item2, x.Item1);
+                                    }
 
+
+                                }
+                                else
+                                {
+                                    DB.SystemCache.GetSystemListBySqDistancesFrom(closestsystemlist, sys.X, sys.Y, sys.Z, req.MaxItems,
+                                                  req.MinDistance, req.MaxDistance, req.Spherical);
+                                }
                                 if (!PendingClose)
                                 {
                                     req.Callback(sys, closestsystemlist);

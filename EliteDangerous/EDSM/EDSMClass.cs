@@ -580,10 +580,21 @@ namespace EliteDangerousCore.EDSM
         #region System Information
 
         // protected against bad JSON
-
-        public List<Tuple<ISystem,double>> GetSphereSystems(String systemName, double maxradius, double minradius)      // may return null
+        public List<Tuple<ISystem, double>> GetSphereSystems(String systemName, double maxradius, double minradius)      // may return null
         {
-            string query = String.Format("api-v1/sphere-systems?systemName={0}&radius={1}&minRadius={2}&showCoordinates=1&showId=1", Uri.EscapeDataString(systemName), maxradius , minradius);
+            return GetRadiusSystems(systemName, maxradius, minradius, true);
+        }
+
+        public List<Tuple<ISystem, double>> GetCubeSystems(String systemName, double maxradius, double minradius)      // may return null
+        {
+            return GetRadiusSystems(systemName, maxradius, minradius, false);
+        }
+
+        public List<Tuple<ISystem,double>> GetRadiusSystems(String systemName, double maxradius, double minradius, Boolean sphere)      // may return null
+        {
+            // no rate detection performed here
+            String qType = sphere ? "sphere" : "cube";
+            string query = String.Format("api-v1/" + qType + "-systems?systemName={0}&radius={1}&minRadius={2}&showPrimaryStar=1&showCoordinates=1&showId=1", Uri.EscapeDataString(systemName), maxradius , minradius);
 
             var response = RequestGet(query, handleException: true);
             if (response.Error)
@@ -612,6 +623,14 @@ namespace EliteDangerousCore.EDSM
                                 sys.Y = co["y"].Double();
                                 sys.Z = co["z"].Double();
                             }
+
+                            JObject primStar = (JObject)sysname["primaryStar"];
+                            if (primStar != null)
+                            {
+                                sys.PrimaryStarType = primStar["type"].Str("Unknown");
+
+                            }
+
                             systems.Add(new Tuple<ISystem, double>(sys, sysname["distance"].Double()));
                         }
 

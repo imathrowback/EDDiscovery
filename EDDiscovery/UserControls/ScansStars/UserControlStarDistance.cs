@@ -148,7 +148,7 @@ namespace EDDiscovery.UserControls
                     if (tvp.Value.Name != name && (checkBoxCube.Checked || (dist >= textMinRadius.Value && dist <= textMaxRadius.Value)))
                     {
                         int visits = discoveryform.history.GetVisitsCount(tvp.Value.Name, tvp.Value.EDSMID);
-                        object[] rowobj = { tvp.Value.Name, $"{dist:0.00}", $"{visits:n0}" };
+                        object[] rowobj = { tvp.Value.Name, $"{dist:0.00}", $"{visits:n0}", tvp.Value.PrimaryStarType };
 
                         int rowindex = dataGridViewNearest.Rows.Add(rowobj);
                         dataGridViewNearest.Rows[rowindex].Tag = tvp.Value;
