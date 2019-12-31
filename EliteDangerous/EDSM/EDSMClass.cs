@@ -597,7 +597,7 @@ namespace EliteDangerousCore.EDSM
             string query = String.Format("api-v1/{0}-systems?systemName={1}&radius={2}&minRadius={3}&showPrimaryStar=1&showCoordinates=1&showId=1", qType, Uri.EscapeDataString(systemName), maxradius , minradius);
 
             // in systems where the stars are close together, this may take a while to complete, so increase the timeout
-            // TODO: Make this "page", doing say 50 LY at a time
+            // TODO: Maybe make this "page" with some kind of iterator, doing say 10 LY increments at a time?
             var response = RequestGet(query, handleException: true, timeout: 10000);
             if (response.Error)
                 return null;

@@ -70,6 +70,7 @@ namespace EDDiscovery.UserControls
             this.colDistance = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colVisited = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colStarType = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.checkBoxEDSM = new ExtendedControls.ExtCheckBox();
             this.contextMenuStrip.SuspendLayout();
             this.flowLayoutStarDistances.SuspendLayout();
             this.dataViewScrollerPanel2.SuspendLayout();
@@ -233,6 +234,7 @@ namespace EDDiscovery.UserControls
             this.flowLayoutStarDistances.Controls.Add(this.labelExtMax);
             this.flowLayoutStarDistances.Controls.Add(this.textMaxRadius);
             this.flowLayoutStarDistances.Controls.Add(this.checkBoxCube);
+            this.flowLayoutStarDistances.Controls.Add(this.checkBoxEDSM);
             this.flowLayoutStarDistances.Dock = System.Windows.Forms.DockStyle.Top;
             this.flowLayoutStarDistances.Location = new System.Drawing.Point(0, 0);
             this.flowLayoutStarDistances.Name = "flowLayoutStarDistances";
@@ -357,6 +359,28 @@ namespace EDDiscovery.UserControls
             this.colStarType.Name = "colStarType";
             this.colStarType.ReadOnly = true;
             // 
+            // checkBoxEDSM
+            // 
+            this.checkBoxEDSM.AutoSize = true;
+            this.checkBoxEDSM.CheckBoxColor = System.Drawing.Color.Gray;
+            this.checkBoxEDSM.CheckBoxDisabledScaling = 0.5F;
+            this.checkBoxEDSM.CheckBoxInnerColor = System.Drawing.Color.White;
+            this.checkBoxEDSM.CheckColor = System.Drawing.Color.DarkBlue;
+            this.checkBoxEDSM.ImageButtonDisabledScaling = 0.5F;
+            this.checkBoxEDSM.ImageIndeterminate = null;
+            this.checkBoxEDSM.ImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.checkBoxEDSM.ImageUnchecked = null;
+            this.checkBoxEDSM.Location = new System.Drawing.Point(246, 1);
+            this.checkBoxEDSM.Margin = new System.Windows.Forms.Padding(0, 1, 8, 1);
+            this.checkBoxEDSM.MouseOverColor = System.Drawing.Color.CornflowerBlue;
+            this.checkBoxEDSM.Name = "checkBoxEDSM";
+            this.checkBoxEDSM.Size = new System.Drawing.Size(79, 17);
+            this.checkBoxEDSM.TabIndex = 5;
+            this.checkBoxEDSM.Text = "Use EDSM";
+            this.checkBoxEDSM.TickBoxReductionRatio = 0.75F;
+            this.checkBoxEDSM.UseVisualStyleBackColor = true;
+            this.checkBoxEDSM.CheckedChanged += new System.EventHandler(this.checkBoxEDSM_CheckedChanged);
+            // 
             // UserControlStarDistance
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -395,5 +419,6 @@ namespace EDDiscovery.UserControls
         private DataGridViewTextBoxColumn colDistance;
         private DataGridViewTextBoxColumn colVisited;
         private DataGridViewTextBoxColumn colStarType;
+        private ExtendedControls.ExtCheckBox checkBoxEDSM;
     }
 }

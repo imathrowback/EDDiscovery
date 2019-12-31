@@ -53,6 +53,10 @@ namespace EDDiscovery.UserControls
             textMaxRadius.SetComparitor(textMinRadius, 2);
 
             checkBoxCube.Checked = EliteDangerousCore.DB.UserDatabase.Instance.GetSettingBool(DbSave + "Behaviour", false);
+            checkBoxEDSM.Checked = EliteDangerousCore.DB.UserDatabase.Instance.GetSettingBool(DbSave + "EDSM", false);
+            
+            // Hide the column if we don't need it
+            this.dataGridViewNearest.Columns["colStarType"].Visible = checkBoxEDSM.Checked;
 
             BaseUtils.Translator.Instance.Translate(this);
             BaseUtils.Translator.Instance.Translate(contextMenuStrip, this);
@@ -80,6 +84,7 @@ namespace EDDiscovery.UserControls
             EliteDangerousCore.DB.UserDatabase.Instance.PutSettingDouble(DbSave + "Min", textMinRadius.Value);
             EliteDangerousCore.DB.UserDatabase.Instance.PutSettingDouble(DbSave + "Max", textMaxRadius.Value);
             EliteDangerousCore.DB.UserDatabase.Instance.PutSettingBool(DbSave + "Behaviour", checkBoxCube.Checked);
+            EliteDangerousCore.DB.UserDatabase.Instance.PutSettingBool(DbSave + "EDSM", checkBoxEDSM.Checked);
         }
 
         public override void InitialDisplay()
@@ -111,7 +116,7 @@ namespace EDDiscovery.UserControls
                 // Get nearby systems from the systems DB.
                 computer.CalculateClosestSystems(he.System, 
                     NewStarListComputedAsync, 
-                    maxitems, textMinRadius.Value, textMaxRadius.Value, !checkBoxCube.Checked
+                    maxitems, textMinRadius.Value, textMaxRadius.Value, !checkBoxCube.Checked, true, queryOnline: checkBoxEDSM.Checked
                     );     // hook here, force closes system update
             }
         }
@@ -262,5 +267,12 @@ namespace EDDiscovery.UserControls
                 KickComputation(last_he, true);
         }
 
+        private void checkBoxEDSM_CheckedChanged(object sender, EventArgs e)
+        {
+            if (this.IsHandleCreated)
+                KickComputation(last_he, true);
+            // Hide the column if we don't need it
+            this.dataGridViewNearest.Columns["colStarType"].Visible = checkBoxEDSM.Checked;
+        }
     }
 }

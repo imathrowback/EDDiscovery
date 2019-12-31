@@ -32,6 +32,7 @@ namespace EliteDangerousCore
         private class StardistRequest
         {
             public ISystem System;
+            public bool QueryOnline;
             public bool IgnoreOnDuplicate;      // don't compute until last one is present
             public double MinDistance;
             public double MaxDistance;
@@ -53,7 +54,7 @@ namespace EliteDangerousCore
         }
 
         public void CalculateClosestSystems(ISystem sys, Action<ISystem, BaseUtils.SortedListDoubleDuplicate<ISystem>> callback,
-                        int maxitems, double mindistance, double maxdistance, bool spherical, bool ignoreDuplicates = true)
+                        int maxitems, double mindistance, double maxdistance, bool spherical, bool ignoreDuplicates = true, bool queryOnline = false)
         {
             closestsystem_queue.Enqueue(new StardistRequest
             {
@@ -63,8 +64,9 @@ namespace EliteDangerousCore
                 MinDistance = mindistance,
                 MaxDistance = maxdistance,
                 Spherical = spherical,
-                IgnoreOnDuplicate = ignoreDuplicates
-            });
+                IgnoreOnDuplicate = ignoreDuplicates,
+                QueryOnline = queryOnline
+            }); ;
             stardistRequested.Set();
         }
 
@@ -101,9 +103,8 @@ namespace EliteDangerousCore
 
                                 //System.Diagnostics.Debug.WriteLine("DB Computer Max distance " + req.MaxDistance);
 
-                                // Don't try to use online for large distances, or the time to load will be *too high*, eg, tens of seconds
-                                bool useOnline = (req.MaxDistance - req.MinDistance < 50);
-                                if (useOnline)
+                                // Try to query online if asked. If this times out, this is FINE, as it will fall through to the local cache                                
+                                if (req.QueryOnline)
                                 {
                                     var edsm = new EDSMClass();
 
@@ -112,16 +113,17 @@ namespace EliteDangerousCore
                                     {
                                         foreach (var x in systems)
                                         {
-                                            closestsystemlist.Add(x.Item2, x.Item1);
+                                            // have to square the distance here because it's stored squared everywhere else
+                                            closestsystemlist.Add(x.Item2 * x.Item2, x.Item1);
                                         }
                                     }
-
-
                                 }
-                                else
+
+                                // If the above failed, or was never executed, the list will be empty, so try the local cache.
+                                if (closestsystemlist.Count == 0)
                                 {
                                     DB.SystemCache.GetSystemListBySqDistancesFrom(closestsystemlist, sys.X, sys.Y, sys.Z, req.MaxItems,
-                                                  req.MinDistance, req.MaxDistance, req.Spherical);
+                                                    req.MinDistance, req.MaxDistance, req.Spherical);
                                 }
                                 if (!PendingClose)
                                 {
